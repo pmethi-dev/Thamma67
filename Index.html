@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>คลังข้อสอบ ธรรมศึกษา</title>
+  <!-- CDN Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <?!= include('Style'); ?>
+</head>
+
+<!-- โค้ดใหม่ที่แก้ไขแล้ว -->
+<body class="bg-queue-gradient min-h-screen text-[#54392D] flex flex-col pb-24">
+
+  <!-- Top Navbar -->
+  <nav class="bg-white/90 backdrop-blur-md text-[#6E493B] shadow-sm sticky top-0 z-40 border-b border-[#F5E6D8]">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex justify-between items-center">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="confirmExitQuiz(() => switchTab('quiz-select'))">
+        <i class="fa-solid fa-dharmachakra text-3xl text-[#C88A6E]"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight text-[#54392D]">THAMMA67</h1>
+          <p class="text-[11px] text-[#9C7A6B]">คลังข้อสอบธรรมศึกษา</p>
+        </div>
+      </div>
+      <div id="nav-user-area" class="flex items-center space-x-2"></div>
+    </div>
+  </nav>
+
+  <!-- Loading Overlay -->
+  <div id="loading-spinner" class="hidden fixed inset-0 bg-[#54392D]/20 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center space-y-4 border border-[#F5E6D8]">
+      <div class="w-12 h-12 border-4 border-[#6E493B] border-t-transparent rounded-full animate-spin"></div>
+      <p id="loading-text" class="text-[#54392D] font-medium">กำลังโหลดข้อมูล...</p>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="max-w-4xl mx-auto px-4 pt-4 pb-8 w-full">
+
+    <!-- Auth Section (แสดงเมื่อยังไม่ได้เข้าสู่ระบบ) -->
+    <section id="sec-auth" class="animate-fade-in max-w-md mx-auto my-4 hidden">
+      <div class="bg-white rounded-3xl shadow-sm border border-[#F5E6D8] overflow-hidden">
+        <div class="flex border-b border-[#F5E6D8] bg-[#FFFBF7]">
+          <button id="btn-tab-login" onclick="switchAuthTab('login')" class="flex-1 py-3 text-center font-semibold text-[#6E493B] border-b-2 border-[#6E493B]">เข้าสู่ระบบ</button>
+          <button id="btn-tab-register" onclick="switchAuthTab('register')" class="flex-1 py-3 text-center font-semibold text-[#A89288] hover:text-[#6E493B]">สมัครสมาชิก</button>
+        </div>
+
+        <form id="form-login" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">ชื่อผู้ใช้งาน (Username)</label>
+            <input type="text" id="login-username" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] focus:outline-none bg-[#FFFBF7]">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">รหัสผ่าน (Password)</label>
+            <input type="password" id="login-password" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] focus:outline-none bg-[#FFFBF7]">
+          </div>
+          <button type="submit" class="w-full bg-[#6E493B] hover:bg-[#54392D] text-white font-semibold py-2.5 rounded-xl transition shadow-sm">เข้าสู่ระบบ</button>
+        </form>
+
+        <form id="form-register" onsubmit="handleRegister(event)" class="p-6 space-y-4 hidden">
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">ชื่อผู้ใช้งาน (Username)</label>
+            <input type="text" id="reg-username" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">รหัสผ่าน (Password)</label>
+            <input type="password" id="reg-password" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">ชื่อ-นามสกุล</label>
+            <input type="text" id="reg-fullname" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">ชื่อเล่น</label>
+              <input type="text" id="reg-nickname" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">ชั้นเรียน</label>
+              <input type="text" id="reg-classroom" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">เลขที่</label>
+              <input type="number" id="reg-no" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">สถานศึกษา</label>
+              <input type="text" id="reg-school" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-[#8EA89D] hover:bg-[#728E83] text-white font-semibold py-2.5 rounded-xl transition shadow-sm">สมัครสมาชิก</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= TAB 1: หน้าหลัก/การทำแบบทดสอบ ================= -->
+    <section id="tab-quiz-select" class="tab-content animate-fade-in space-y-6">
+      <div>
+        <h2 class="text-xl font-bold text-[#54392D] mb-4 flex items-center">
+          <i class="fa-solid fa-graduation-cap text-[#C88A6E] me-2"></i>เลือกระดับชั้นธรรมศึกษา
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div onclick="selectLevel('tri')" class="bg-white p-6 rounded-3xl shadow-sm border border-[#F5E6D8] hover:shadow-md hover:border-[#E5C3AD] cursor-pointer transition flex flex-col justify-between">
+            <div>
+              <span class="px-3 py-1 bg-[#FFF2E5] text-[#C88A6E] rounded-full text-xs font-bold">ระดับ 1</span>
+              <h3 class="text-2xl font-bold text-[#54392D] mt-2">ธรรมศึกษาชั้นตรี</h3>
+              <p class="text-[#A89288] text-sm mt-1">คลังข้อสอบ ธรรมวิภาค พุทธประวัติ วินัย</p>
+            </div>
+            <div class="mt-4 flex items-center text-[#C88A6E] font-medium"><span>เริ่มทำข้อสอบ</span><i class="fa-solid fa-arrow-right ms-2"></i></div>
+          </div>
+
+          <div onclick="selectLevel('tho')" class="bg-white p-6 rounded-3xl shadow-sm border border-[#F5E6D8] hover:shadow-md hover:border-[#7FA5B8] cursor-pointer transition flex flex-col justify-between">
+            <div>
+              <span class="px-3 py-1 bg-[#EDF5F8] text-[#5A879E] rounded-full text-xs font-bold">ระดับ 2</span>
+              <h3 class="text-2xl font-bold text-[#54392D] mt-2">ธรรมศึกษาชั้นโท</h3>
+              <p class="text-[#A89288] text-sm mt-1">คลังข้อสอบ ธรรมวิภาค พุทธประวัติ วินัย</p>
+            </div>
+            <div class="mt-4 flex items-center text-[#5A879E] font-medium"><span>เริ่มทำข้อสอบ</span><i class="fa-solid fa-arrow-right ms-2"></i></div>
+          </div>
+
+          <div onclick="selectLevel('ek')" class="bg-white p-6 rounded-3xl shadow-sm border border-[#F5E6D8] hover:shadow-md hover:border-[#8C6D87] cursor-pointer transition flex flex-col justify-between">
+            <div>
+              <span class="px-3 py-1 bg-[#F7F0F5] text-[#8C6D87] rounded-full text-xs font-bold">ระดับ 3</span>
+              <h3 class="text-2xl font-bold text-[#54392D] mt-2">ธรรมศึกษาชั้นเอก</h3>
+              <p class="text-[#A89288] text-sm mt-1">คลังข้อสอบ ธรรมวิภาค พุทธประวัติ วินัย</p>
+            </div>
+            <div class="mt-4 flex items-center text-[#8C6D87] font-semibold"><span>เริ่มทำข้อสอบ</span><i class="fa-solid fa-arrow-right ms-2"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sub-Section: เลือกหมวดวิชา -->
+    <section id="sec-subject" class="animate-fade-in space-y-6 hidden">
+      <div class="flex items-center space-x-4">
+        <button onclick="showSubjectSelection(false)" class="p-2 bg-white rounded-full shadow-sm text-[#6E493B] border border-[#F5E6D8] hover:bg-[#FFF9F2]"><i class="fa-solid fa-arrow-left"></i></button>
+        <h2 id="selected-level-title" class="text-2xl font-bold text-[#54392D]">เลือกวิชาข้อสอบ</h2>
+      </div>
+
+      <div class="bg-white p-5 rounded-3xl border border-[#F5E6D8] shadow-sm space-y-3">
+        <label class="font-bold text-[#54392D] flex items-center text-base"><i class="fa-solid fa-list-check text-[#C88A6E] me-2"></i>เลือกจำนวนข้อสอบที่ต้องการทำ:</label>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
+          <button type="button" onclick="setQuestionAmount(10)" id="btn-count-10" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">10 ข้อ</button>
+          <button type="button" onclick="setQuestionAmount(20)" id="btn-count-20" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">20 ข้อ</button>
+          <button type="button" onclick="setQuestionAmount(30)" id="btn-count-30" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">30 ข้อ</button>
+          <button type="button" onclick="setQuestionAmount(40)" id="btn-count-40" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">40 ข้อ</button>
+          <button type="button" onclick="setQuestionAmount(50)" id="btn-count-50" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">50 ข้อ</button>
+          <button type="button" onclick="setQuestionAmount(100)" id="btn-count-100" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">100 ข้อ</button>
+          <button type="button" onclick="setQuestionAmount(150)" id="btn-count-150" class="btn-qcount py-2 rounded-xl border border-[#F5E6D8] font-bold text-[#6E493B] text-center text-sm">150 ข้อ</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="subject-cards-container"></div>
+    </section>
+
+    <!-- Sub-Section: หน้าทำแบบทดสอบ (Quiz Active) -->
+    <section id="sec-quiz" class="animate-fade-in space-y-6 hidden">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-[#F5E6D8] space-y-3">
+        <div class="flex justify-between items-center">
+          <div>
+            <span id="quiz-badge-level" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#FFF2E5] text-[#C88A6E] me-2"></span>
+            <span id="quiz-badge-subject" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#FFF9F2] text-[#6E493B]"></span>
+          </div>
+          <div class="text-sm font-semibold text-[#8A756C]">
+            <i class="fa-regular fa-clock me-1 text-[#C88A6E]"></i><span id="quiz-timer" class="text-[#C88A6E] font-bold">--:--</span>
+          </div>
+        </div>
+        <div class="w-full bg-[#FFF9F2] rounded-full h-2.5 overflow-hidden border border-[#F5E6D8]">
+          <div id="quiz-progress-bar" class="bg-[#C88A6E] h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-[#A89288]">
+          <span>ตอบแล้ว <span id="quiz-answered-num" class="font-bold text-[#C88A6E]">0</span> ข้อ</span>
+          <span>ข้อที่ <span id="quiz-current-num" class="text-[#C88A6E] font-bold">1</span> / <span id="quiz-total-num">10</span></span>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-[#F5E6D8] space-y-6">
+        <h3 id="quiz-question-title" class="text-lg font-semibold text-[#54392D] leading-relaxed">คำถาม...</h3>
+        <div id="quiz-options-container" class="space-y-3"></div>
+      </div>
+
+      <div class="bg-white p-4 rounded-3xl shadow-sm border border-[#F5E6D8] space-y-3">
+        <div class="flex items-center space-x-2 overflow-x-auto py-1 no-scrollbar" id="quiz-nav-grid"></div>
+        <div class="flex justify-between items-center pt-2 border-t border-[#F5E6D8]">
+          <button id="btn-prev-q" onclick="navigateQuiz(-1)" class="px-5 py-2.5 bg-[#F5E6D8] text-[#6E493B] font-medium rounded-xl disabled:opacity-50">ข้อก่อนหน้า</button>
+          <button id="btn-next-q" onclick="navigateQuiz(1)" class="px-6 py-2.5 bg-[#6E493B] text-white font-medium rounded-xl shadow-sm">ข้อต่อไป</button>
+          <button id="btn-submit-q" onclick="submitQuizToServer()" class="hidden px-6 py-2.5 bg-[#728E83] text-white font-semibold rounded-xl shadow-sm">ส่งคำตอบ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sub-Section: สรุปผลข้อสอบ -->
+    <section id="sec-result" class="animate-fade-in space-y-6 hidden">
+      <div class="bg-white p-8 rounded-3xl shadow-sm border border-[#F5E6D8] text-center space-y-4">
+        <div class="w-20 h-20 mx-auto rounded-full bg-[#FFF2E5] flex items-center justify-center text-[#C88A6E] text-3xl font-bold"><i class="fa-solid fa-award"></i></div>
+        <h2 class="text-2xl font-bold text-[#54392D]">สรุปผลการทดสอบ</h2>
+        <div class="text-4xl font-extrabold text-[#C88A6E]" id="result-score-text">0 / 0</div>
+        <p class="text-[#A89288] text-sm" id="result-percent-text">คิดเป็น 0%</p>
+        <div class="flex justify-center space-x-3 pt-2">
+          <button onclick="switchTab('quiz-select')" class="px-5 py-2.5 bg-[#F5E6D8] text-[#6E493B] font-medium rounded-xl">กลับหน้าหลัก</button>
+          <button onclick="switchTab('history')" class="px-6 py-2.5 bg-[#6E493B] text-white font-medium rounded-xl shadow-sm">ดูสถิติและประวัติ</button>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-[#F5E6D8] space-y-4">
+        <h3 class="text-lg font-bold text-[#54392D] border-b border-[#F5E6D8] pb-2"><i class="fa-solid fa-magnifying-glass me-2 text-[#C88A6E]"></i>เฉลยและคำอธิบาย</h3>
+        <div id="result-review-container" class="space-y-4 divide-y divide-[#F5E6D8]"></div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: ตารางอันดับคะแนนสูงสุด ================= -->
+    <section id="tab-leaderboard" class="tab-content animate-fade-in space-y-6 hidden">
+      <div class="bg-white rounded-3xl shadow-sm border border-[#F5E6D8] overflow-hidden">
+        <div class="p-4 md:p-6 border-b border-[#F5E6D8] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-[#54392D]"><i class="fa-solid fa-trophy text-[#DDB06D] me-2"></i>ตารางอันดับคะแนนสูงสุด</h2>
+            <p class="text-xs text-[#A89288] mt-0.5">* แสดงคะแนนที่ดีที่สุดของแต่ละบุคคล</p>
+          </div>
+          <div class="flex items-center space-x-1 bg-[#FFF9F2] p-1.5 rounded-2xl text-xs font-semibold border border-[#F5E6D8]">
+            <button id="tab-lb-all" onclick="filterLeaderboard('all')" class="px-3 py-1.5 rounded-xl bg-white text-[#6E493B] shadow-sm">ทั้งหมด</button>
+            <button id="tab-lb-tri" onclick="filterLeaderboard('ชั้นตรี')" class="px-3 py-1.5 rounded-xl text-[#A89288]">ชั้นตรี</button>
+            <button id="tab-lb-tho" onclick="filterLeaderboard('ชั้นโท')" class="px-3 py-1.5 rounded-xl text-[#A89288]">ชั้นโท</button>
+            <button id="tab-lb-ek" onclick="filterLeaderboard('ชั้นเอก')" class="px-3 py-1.5 rounded-xl text-[#A89288]">ชั้นเอก</button>
+            <button onclick="loadLeaderboard()" class="text-[#A89288] px-2 py-1.5" title="รีเฟรช"><i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-[#54392D]">
+            <thead class="bg-[#FFFBF7] text-[#6E493B] uppercase text-xs font-semibold border-b border-[#F5E6D8]">
+              <tr>
+                <th class="px-4 py-3 text-center">อันดับ</th>
+                <th class="px-4 py-3">ผู้ทดสอบ</th>
+                <th class="px-4 py-3">โรงเรียน</th>
+                <th class="px-4 py-3 text-center">ชั้น</th>
+                <th class="px-4 py-3 text-center">คะแนน</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody" class="divide-y divide-[#F5E6D8]"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: คะแนนสะสมรวม & ประวัติการทดสอบ ================= -->
+    <section id="tab-history" class="tab-content animate-fade-in space-y-6 hidden">
+      <div class="bg-white rounded-3xl shadow-sm border border-[#F5E6D8] overflow-hidden">
+        
+        <!-- Header ส่วนบน (รวมข้อมูลโปรไฟล์ + สถิติคะแนน + ปุ่มรีเฟรช ไว้ในแถบเดียว) -->
+        <div class="p-4 md:p-6 border-b border-[#F5E6D8] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          <!-- ฝั่งซ้าย: ข้อมูลผู้ใช้งาน -->
+          <div class="flex items-center space-x-3.5">
+            <div class="w-12 h-12 bg-[#6E493B] text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0">
+              <i class="fa-solid fa-circle-user"></i>
+            </div>
+            <div class="overflow-hidden min-w-0">
+              <div class="flex items-center space-x-2">
+                <h3 id="dash-user-fullname" class="text-base md:text-lg font-bold text-[#54392D] truncate">กำลังโหลด...</h3>
+                <span id="dash-user-nickname" class="px-2 py-0.5 text-[11px] font-semibold bg-[#FFF2E5] text-[#C88A6E] rounded-full border border-[#FCDCC7] shrink-0"></span>
+              </div>
+              <p id="dash-user-school-info" class="text-xs text-[#8A756C] truncate mt-0.5">ชั้น - | โรงเรียน -</p>
+            </div>
+          </div>
+
+          <!-- ฝั่งขวา: Badge สรุปคะแนน & จำนวนครั้ง + ปุ่มรีเฟรช (สไตล์แคปซูลเดียวกับหน้าอันดับ) -->
+          <div class="flex items-center space-x-2 bg-[#FFF9F2] p-1.5 rounded-2xl text-xs font-semibold border border-[#F5E6D8] self-start md:self-auto">
+            
+            <!-- คะแนนสะสมรวม -->
+            <div class="flex items-center space-x-1.5 px-3 py-1.5 bg-white rounded-xl shadow-sm text-[#6E493B]">
+              <i class="fa-solid fa-star text-[#C88A6E]"></i>
+              <span>สะสม: <strong id="dash-accum-score" class="text-[#C88A6E] font-bold">0</strong> คะแนน</span>
+            </div>
+
+            <!-- จำนวนครั้งที่ทำ -->
+            <div class="flex items-center space-x-1.5 px-3 py-1.5 text-[#54392D]">
+              <i class="fa-solid fa-pen-to-square text-[#8EA89D]"></i>
+              <span>สอบ: <strong id="dash-total-attempts" class="font-bold">0</strong> ครั้ง</span>
+            </div>
+
+            <!-- ปุ่มรีเฟรช -->
+            <button onclick="loadUserDashboard()" class="text-[#A89288] hover:text-[#6E493B] px-2 py-1.5 transition" title="รีเฟรช">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- ตารางแสดงประวัติย้อนหลัง -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-[#54392D]">
+            <thead class="bg-[#FFFBF7] text-[#6E493B] uppercase text-xs font-semibold border-b border-[#F5E6D8]">
+              <tr>
+                <th class="px-2 py-3 text-center">ครั้ง</th>
+                <th class="px-3 py-3">วัน-เวลา</th>
+                <th class="px-3 py-3">ชั้น</th>
+                <th class="px-3 py-3">วิชา</th>
+                <th class="px-3 py-3 text-center">คะแนน</th>
+                <th class="px-3 py-3 text-center">สะสม</th>
+              </tr>
+            </thead>
+            <tbody id="user-history-tbody" class="divide-y divide-[#F5E6D8]"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: ข้อมูลโปรไฟล์ส่วนตัว ================= -->
+    <section id="tab-profile" class="tab-content animate-fade-in space-y-6 hidden">
+      <div class="bg-white rounded-3xl shadow-sm border border-[#F5E6D8] p-6 space-y-4 max-w-2xl mx-auto">
+        <h2 class="text-lg font-bold text-[#54392D] border-b border-[#F5E6D8] pb-3 flex items-center justify-between">
+          <span><i class="fa-solid fa-user-gear text-[#C88A6E] me-2"></i>ข้อมูลโปรไฟล์</span>
+          <span class="text-xs text-[#A89288] font-normal">แก้ไขข้อมูลแล้วกดบันทึก</span>
+        </h2>
+        <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">ชื่อ-นามสกุล</label>
+            <input type="text" id="edit-fullname" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">ชื่อเล่น</label>
+              <input type="text" id="edit-nickname" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">ชั้นเรียน</label>
+              <input type="text" id="edit-classroom" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">เลขที่</label>
+              <input type="number" id="edit-no" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#6E493B] mb-1">สถานศึกษา</label>
+              <input type="text" id="edit-school" required class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-[#6E493B] mb-1">เปลี่ยนรหัสผ่านใหม่ (หากไม่เปลี่ยนให้เว้นว่างไว้)</label>
+            <input type="password" id="edit-password" placeholder="รหัสผ่านใหม่" class="w-full px-4 py-2 border border-[#E8D5C4] rounded-xl focus:ring-2 focus:ring-[#C88A6E] bg-[#FFFBF7]">
+          </div>
+          <div class="pt-2">
+            <button type="submit" class="w-full bg-[#6E493B] hover:bg-[#54392D] text-white font-semibold py-2.5 rounded-xl shadow-sm transition">บันทึกข้อมูลโปรไฟล์</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= Bottom Floating Navigation Bar (ขนาดกะทัดรัด/บางลง) ================= -->
+  <div id="mobile-bottom-nav" class="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 w-[85%] max-w-xs md:max-w-sm">
+    <div class="bg-white/95 backdrop-blur-md text-[#54392D] rounded-full px-2 py-1 shadow-lg flex items-center justify-around border border-[#F5E6D8]">
+      
+      <!-- ปุ่มที่ 1: หน้าหลัก / ทำข้อสอบ -->
+      <button onclick="confirmExitQuiz(() => switchTab('quiz-select'))" id="nav-btn-quiz-select" class="nav-tab-btn flex flex-col items-center justify-center py-0.5 px-2 text-[#A89288] transition">
+        <div class="nav-icon-bg w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-graduation-cap text-base"></i></div>
+        <span class="text-[9px] font-medium">ทำข้อสอบ</span>
+      </button>
+
+      <!-- ปุ่มที่ 2: ตารางอันดับ -->
+      <button onclick="confirmExitQuiz(() => switchTab('leaderboard'))" id="nav-btn-leaderboard" class="nav-tab-btn flex flex-col items-center justify-center py-0.5 px-2 text-[#A89288] transition">
+        <div class="nav-icon-bg w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-trophy text-base"></i></div>
+        <span class="text-[9px] font-medium">อันดับ</span>
+      </button>
+
+      <!-- ปุ่มที่ 3: คะแนน & ประวัติ -->
+      <button onclick="confirmExitQuiz(() => switchTab('history'))" id="nav-btn-history" class="nav-tab-btn flex flex-col items-center justify-center py-0.5 px-2 text-[#A89288] transition">
+        <div class="nav-icon-bg w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-clock-rotate-left text-base"></i></div>
+        <span class="text-[9px] font-medium">คะแนน/ประวัติ</span>
+      </button>
+
+      <!-- ปุ่มที่ 4: โปรไฟล์ส่วนตัว -->
+      <button onclick="confirmExitQuiz(() => switchTab('profile'))" id="nav-btn-profile" class="nav-tab-btn flex flex-col items-center justify-center py-0.5 px-2 text-[#A89288] transition">
+        <div class="nav-icon-bg w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-user-gear text-base"></i></div>
+        <span class="text-[9px] font-medium">โปรไฟล์</span>
+      </button>
+
+    </div>
+  </div>
+
+  <?!= include('JavaScript'); ?>
+</body>
+</html>
