@@ -11,7 +11,79 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <?!= include('Style'); ?>
+  <style>
+  body {
+    font-family: 'Kanit', sans-serif;
+    background-color: #FFF9F2;
+  }
+
+  .bg-queue-gradient {
+    background: linear-gradient(180deg, #FFF9F2 0%, #FFF2E5 100%);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.25s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* SweetAlert Custom Style */
+  .swal2-popup {
+    font-family: 'Kanit', sans-serif !important;
+    border-radius: 1.5rem !important;
+    background-color: #FFFBF7 !important;
+    border: 1px solid #F5E6D8 !important;
+    color: #54392D !important;
+  }
+
+  .swal2-title {
+    color: #54392D !important;
+    font-weight: 700 !important;
+  }
+
+  .swal2-confirm {
+    background-color: #6E493B !important;
+    color: #FFFFFF !important;
+    border-radius: 0.75rem !important;
+  }
+
+  .swal2-cancel {
+    background-color: #F5E6D8 !important;
+    color: #6E493B !important;
+    border-radius: 0.75rem !important;
+  }
+
+  /* Bottom Navigation Active State */
+  .nav-tab-btn.active {
+    color: #C88A6E !important;
+    font-weight: 700 !important;
+  }
+
+  .nav-tab-btn.active .nav-icon-bg {
+    background-color: #FFF2E5 !important;
+    color: #C88A6E !important;
+    transform: translateY(-2px);
+  }
+</style>
+  
 </head>
 
 <!-- โค้ดใหม่ที่แก้ไขแล้ว -->
